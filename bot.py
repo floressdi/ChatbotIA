@@ -128,9 +128,9 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("cita", iniciar_cita)],
         states={
-            ELEGIR_DIA: [MessageHandler(filters.TEXT & ~filters.COMMAND, )],
-            ELEGIR_HORA: [MessageHandler(filters.TEXT & ~filters.COMMAND, )],
-            ELEGIR_TEMA: [MessageHandler(filters.TEXT & ~filters.COMMAND,)],
+            ELEGIR_DIA: [MessageHandler(filters.TEXT & ~filters.COMMAND,recibir_dia )],
+            ELEGIR_HORA: [MessageHandler(filters.TEXT & ~filters.COMMAND,recibir_hora )],
+            ELEGIR_TEMA: [MessageHandler(filters.TEXT & ~filters.COMMAND,recibir_tema)],
         },
         fallbacks=[CommandHandler("cancelar", cancelar_cita)],
     )

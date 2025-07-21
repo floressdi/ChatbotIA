@@ -12,7 +12,7 @@ def generar_respuesta(texto):
             "¡Hola! 😊 ¿Cómo te sientes hoy?",
             "¡Holaaa! ¿En qué puedo ayudarte?",
             "¡Holiii! Cuéntame, ¿cómo estás?",
-            "¡Hola! Espero que tengas un gran día.",
+            "¡Hola! Espero que tengas un gran día.", 
             "¡Hola! ¿Quieres hablar sobre algo en especial?"
         ]
         comandos = (
