@@ -2,7 +2,7 @@ import logging
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters, ConversationHandler
 from pln_respuestas import generar_respuesta
-
+from agendar_citas import iniciar_cita, recibir_citas, guardar_citas, get_available_times_json
 # --- 1. Configuración Inicial ---
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -72,6 +72,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     await update.message.reply_text(respuesta)
 
 # --- 4. Cita (ConversationHandler) ---
+
 ELEGIR_DIA, ELEGIR_HORA, ELEGIR_TEMA = range(3)
 
 async def iniciar_cita(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -80,13 +81,23 @@ async def iniciar_cita(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
 
 async def recibir_dia(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data["dia"] = update.message.text
-    await update.message.reply_text("¿A qué hora deseas tu cita? (ej. 10:00 AM)")
+    dias_disponibles = get_available_times_json(update.message.text)
+    if not dias_disponibles:
+        await update.message.reply_text("No hay horarios disponibles para ese día. Elige otra fecha.")
+        return ELEGIR_DIA
+    times_str = ", ".join(dias_disponibles)
+    await update.message.reply_text(f"¿A qué hora deseas tu cita? (elige una de estas: {times_str})")
     return ELEGIR_HORA
-
+ 
 async def recibir_hora(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data["hora"] = update.message.text
     await update.message.reply_text("¿Cuál es el motivo de tu cita?")
     return ELEGIR_TEMA
+
+# async def recibir_hora(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+#     context.user_data["hora"] = update.message.text
+#     await update.message.reply_text("¿Cuál es el motivo de tu cita?")
+#     return ELEGIR_TEMA
 
 async def recibir_tema(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data["tema"] = update.message.text
@@ -117,9 +128,9 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("cita", iniciar_cita)],
         states={
-            ELEGIR_DIA: [MessageHandler(filters.TEXT & ~filters.COMMAND, recibir_dia)],
-            ELEGIR_HORA: [MessageHandler(filters.TEXT & ~filters.COMMAND, recibir_hora)],
-            ELEGIR_TEMA: [MessageHandler(filters.TEXT & ~filters.COMMAND, recibir_tema)],
+            ELEGIR_DIA: [MessageHandler(filters.TEXT & ~filters.COMMAND, )],
+            ELEGIR_HORA: [MessageHandler(filters.TEXT & ~filters.COMMAND, )],
+            ELEGIR_TEMA: [MessageHandler(filters.TEXT & ~filters.COMMAND,)],
         },
         fallbacks=[CommandHandler("cancelar", cancelar_cita)],
     )
